@@ -1,6 +1,7 @@
 package com.example.tracklocation;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -8,21 +9,80 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 
+import java.util.Date;
 import java.util.Iterator;
 
 /**
  * Created by Asif on 02/11/2015.
  */
-public class MyGPSListener implements GpsStatus.Listener {
-
+public class GpsListener implements GpsStatus.Listener {
+    public static final String TAG = GpsListener.class.getSimpleName();
     private Context mContext;
     private LocationManager mLocationManager;
     private Location mLocation;
     private String mGpsInfo;
+    private Date mDate;
+    private double mLatitude;
+    private double mLongitude;
+    private float mSpeed;
     private long mLastLocationMillis;
     private boolean mIsGPSFix;
+
+    public GpsListener(Context context) {
+
+        mContext = context;
+
+        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager.addGpsStatusListener(this);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                if (location == null)
+                    return;
+
+                mLastLocationMillis = SystemClock.elapsedRealtime();
+
+                mLocation = location;
+                mDate = new Date(mLocation.getTime());
+                mLatitude = mLocation.getLatitude();
+                mLongitude = mLocation.getLongitude();
+                mSpeed = mLocation.getSpeed();
+
+                update();
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+        });
+    }
+
+    public Date getDate() {
+        return mDate;
+    }
+
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
+    }
+
+    public float getSpeed() {
+        return mSpeed;
+    }
 
     public String getLocation() {
         if (mLocation == null)
@@ -42,41 +102,17 @@ public class MyGPSListener implements GpsStatus.Listener {
         return mIsGPSFix;
     }
 
-    public MyGPSListener(Context context) {
+    public String getGpsInfo() {
+        return mGpsInfo;
+    }
 
-        mContext = context;
-
-        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        mLocationManager.addGpsStatusListener(this);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-                Log.d(MainActivity.TAG, "onLocationChanged");
-
-                if (location == null) return;
-
-                mLastLocationMillis = SystemClock.elapsedRealtime();
-
-                // Do something.
-                mLocation = location;
-
-                ((MainActivity) mContext).updateUI(mIsGPSFix, mGpsInfo, getLocation());
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-        });
+    public void update() {
+        Intent intent = new Intent();
+        intent.setAction(Common.ACTION_STRING_SERVICE);
+        intent.putExtra(Common.GPS_FIX, getIsGpsFix());
+        intent.putExtra(Common.GPS_INFO, getGpsInfo());
+        intent.putExtra(Common.GPS_LOCATION, getLocation());
+        mContext.sendBroadcast(intent);
     }
 
     @Override
@@ -130,7 +166,7 @@ public class MyGPSListener implements GpsStatus.Listener {
             }
         }
 
-        ((MainActivity) mContext).updateUI(mIsGPSFix, mGpsInfo, getLocation());
+        update();
 
     }
 }
