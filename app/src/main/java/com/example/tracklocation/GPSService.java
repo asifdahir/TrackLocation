@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.tracklocation.Model.Location;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,10 +40,17 @@ public class GPSService extends Service {
                 stopTimer();
             }
         } catch (Exception ex) {
-            Log.d(TAG, ex.toString());
+            Log.d(TAG, ex.getMessage(), ex);
         }
 
         return Service.START_STICKY;
+    }
+
+    @Override
+    public boolean stopService(Intent name) {
+        if (mSaveDataInDB)
+            stopTimer();
+        return super.stopService(name);
     }
 
     @Override
@@ -56,13 +64,23 @@ public class GPSService extends Service {
             public void run() {
                 mHandler.post(new Runnable() {
                     public void run() {
+                        Log.d(TAG, "run");
+                        Location location = new Location();
+                        location.setDate("2015-11-13 14:00");
+                        location.setLatitude(33.33);
+                        location.setLongitude(73.33);
+                        location.setSpeed(10);
+                        if (mDatabaseHandler == null)
+                            mDatabaseHandler = new DatabaseHandler(getApplicationContext());
+                        mDatabaseHandler.addLocation(location);
+
                         if (mGpsListener == null)
                             return;
 
                         if (!mGpsListener.getIsGpsFix())
                             return;
 
-                        Location location = new Location();
+                        location = new Location();
                         location.setDate(Common.getDate(mGpsListener.getDate().getTime()));
                         location.setLatitude(mGpsListener.getLatitude());
                         location.setLongitude(mGpsListener.getLongitude());
