@@ -103,7 +103,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_search_locations) {
-            //startActivity();
+            Intent intent = new Intent(this, SearchLocationsActivity.class);
+            startActivity(intent);
             return true;
         }
 
