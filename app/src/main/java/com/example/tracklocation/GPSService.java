@@ -65,14 +65,6 @@ public class GPSService extends Service {
                 mHandler.post(new Runnable() {
                     public void run() {
                         Log.d(TAG, "run");
-                        Location location = new Location();
-                        location.setDate("2015-11-13 14:00");
-                        location.setLatitude(33.33);
-                        location.setLongitude(73.33);
-                        location.setSpeed(10);
-                        if (mDatabaseHandler == null)
-                            mDatabaseHandler = new DatabaseHandler(getApplicationContext());
-                        mDatabaseHandler.addLocation(location);
 
                         if (mGpsListener == null)
                             return;
@@ -80,7 +72,7 @@ public class GPSService extends Service {
                         if (!mGpsListener.getIsGpsFix())
                             return;
 
-                        location = new Location();
+                        Location location = new Location();
                         location.setDate(Common.getDate(mGpsListener.getDate().getTime()));
                         location.setLatitude(mGpsListener.getLatitude());
                         location.setLongitude(mGpsListener.getLongitude());

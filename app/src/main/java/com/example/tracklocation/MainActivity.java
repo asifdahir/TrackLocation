@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,6 +43,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mButtonStart.setEnabled(false);
         mSaveDataInDB = true;
 
+        mMainActivityReceiver = new MainActivityReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Common.ACTION_STRING_SERVICE);
+        registerReceiver(mMainActivityReceiver, intentFilter);
+
         mSharedPreferences = this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         mSharedPreferences.edit().putInt(Common.SAVE_DATA_IN_DB, 1).apply();
 
@@ -57,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSharedPreferences = this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         mSharedPreferences.edit().putInt(Common.SAVE_DATA_IN_DB, 0).apply();
 
-        unregisterReceiver(mMainActivityReceiver);
+        if (mMainActivityReceiver != null)
+            unregisterReceiver(mMainActivityReceiver);
 
         Intent i = new Intent(this, GPSService.class);
         stopService(i);
@@ -83,11 +90,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (mSaveDataInDB)
             mButtonStart.setEnabled(false);
-
-        mMainActivityReceiver = new MainActivityReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Common.ACTION_STRING_SERVICE);
-        registerReceiver(mMainActivityReceiver, intentFilter);
     }
 
     @Override
@@ -141,7 +143,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onStop() {
-        unregisterReceiver(mMainActivityReceiver);
+
+        try {
+            if (mMainActivityReceiver != null)
+                unregisterReceiver(mMainActivityReceiver);
+        } catch (Exception ex) {
+            Log.d(TAG, ex.getMessage(), ex);
+        }
 
         super.onStop();
     }
