@@ -1,6 +1,7 @@
 package com.example.tracklocation;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import com.example.tracklocation.Model.Location;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 11/13/2015.
@@ -20,6 +22,11 @@ public class SearchLocationsActivity extends AppCompatActivity implements View.O
 
     public static final String TAG = SearchLocationsActivity.class.getSimpleName();
     private Button mButtonPlot = null;
+
+    private void plotLocationsOnMap() {
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,7 @@ public class SearchLocationsActivity extends AppCompatActivity implements View.O
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_plot:
+                plotLocationsOnMap();
                 break;
         }
     }

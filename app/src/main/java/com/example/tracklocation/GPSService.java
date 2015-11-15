@@ -86,7 +86,7 @@ public class GPSService extends Service {
             }
         };
 
-        mTimer.schedule(mTimerTask, 1, 10 * 1000);
+        mTimer.schedule(mTimerTask, 10 * 1000, 10 * 1000);
     }
 
     private void stopTimer() {

@@ -39,6 +39,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textViewLocation.setText("Location\n" + location);
     }
 
+    private void unregisterReceiver() {
+        try {
+            if (mMainActivityReceiver != null)
+                unregisterReceiver(mMainActivityReceiver);
+        } catch (Exception ex) {
+            Log.d(TAG, ex.getMessage(), ex);
+        }
+    }
+
     private void onButtonStart() {
         mButtonStart.setEnabled(false);
         mSaveDataInDB = true;
@@ -63,8 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSharedPreferences = this.getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         mSharedPreferences.edit().putInt(Common.SAVE_DATA_IN_DB, 0).apply();
 
-        if (mMainActivityReceiver != null)
-            unregisterReceiver(mMainActivityReceiver);
+        unregisterReceiver();
 
         Intent i = new Intent(this, GPSService.class);
         stopService(i);
@@ -101,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_search_locations) {
@@ -144,12 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStop() {
 
-        try {
-            if (mMainActivityReceiver != null)
-                unregisterReceiver(mMainActivityReceiver);
-        } catch (Exception ex) {
-            Log.d(TAG, ex.getMessage(), ex);
-        }
+        unregisterReceiver();
 
         super.onStop();
     }
