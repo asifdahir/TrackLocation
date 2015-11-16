@@ -2,7 +2,6 @@ package com.example.tracklocation;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +27,7 @@ public class MapActivity extends AppCompatActivity {
 
         try {
             // Loading map
-            initilizeMap();
+            initializeMap();
 
             // Changing map type
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -58,63 +57,19 @@ public class MapActivity extends AppCompatActivity {
             double latitude = 17.385044;
             double longitude = 78.486671;
 
-            // lets place some 10 random markers
-            for (int i = 0; i < 10; i++) {
-                // random latitude and logitude
-                double[] randomLocation = createRandLocation(latitude,
-                        longitude);
+            MarkerOptions marker = new MarkerOptions().position(
+                    new LatLng(latitude, longitude))
+                    .title("Hello Maps");
 
-                // Adding a marker
-                MarkerOptions marker = new MarkerOptions().position(
-                        new LatLng(randomLocation[0], randomLocation[1]))
-                        .title("Hello Maps " + i);
+            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
-                Log.e(TAG, "> " + randomLocation[0] + ", " + randomLocation[1]);
+            googleMap.addMarker(marker);
 
-                // changing marker color
-                if (i == 0)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                if (i == 1)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                if (i == 2)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
-                if (i == 3)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                if (i == 4)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                if (i == 5)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-                if (i == 6)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                if (i == 7)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-                if (i == 8)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-                if (i == 9)
-                    marker.icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(latitude, longitude)).zoom(15).build();
 
-                googleMap.addMarker(marker);
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                // Move the camera to last position with a zoom level
-                if (i == 9) {
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(randomLocation[0],
-                                    randomLocation[1])).zoom(15).build();
-
-                    googleMap.animateCamera(CameraUpdateFactory
-                            .newCameraPosition(cameraPosition));
-                }
-            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,29 +80,17 @@ public class MapActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        initilizeMap();
+        initializeMap();
     }
 
-    /**
-     * function to load map If map is not created it will create it for you
-     */
-    private void initilizeMap() {
+    private void initializeMap() {
         if (googleMap == null) {
             googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 
             // check if map is created successfully or not
             if (googleMap == null) {
-                Toast.makeText(getApplicationContext(),
-                        "Sorry! unable to create maps", Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(getApplicationContext(), "Sorry! unable to create maps", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private double[] createRandLocation(double latitude, double longitude) {
-
-        return new double[]{latitude + ((Math.random() - 0.5) / 500),
-                longitude + ((Math.random() - 0.5) / 500),
-                150 + ((Math.random() - 0.5) * 10)};
     }
 }
